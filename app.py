@@ -10,7 +10,7 @@ app.secret_key = "mysecretkey"
 bcrypt = Bcrypt(app)
 from pymongo import MongoClient
 
-MONGO_URI = os.environ.get("MONGO_URI")  # set this in Render environment variables
+MONGO_URI = os.environ.get("MONGO_URI", "mongodb://localhost:27017")  # Defaults to local MongoDB if not set
 client = MongoClient(MONGO_URI)
 db = client["travel_booking"]
 users_collection = db["users"]
