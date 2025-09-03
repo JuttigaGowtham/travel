@@ -3,17 +3,30 @@ from flask_bcrypt import Bcrypt
 from pymongo import MongoClient
 import os
 
+
 app = Flask(__name__)   # ✅ Corrected
 app.secret_key = "mysecretkey"
+bcrypt = Bcrypt(app)
 
 # ====== MongoDB Connection ======
 from pymongo import MongoClient
 
-MONGO_URI = os.environ.get("MONGO_URI")  # set this in Render environment variables
-client = MongoClient(MONGO_URI)
-db = client["travel_booking"]
-users_collection = db["users"]
-messages_collection = db["messages"]
+
+# ====== MongoDB Connection with fallback and error handling ======
+MONGO_URI = os.environ.get("MONGO_URI", "mongodb://localhost:27017/travel_booking")
+try:
+    client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=5000)
+    # Try to force connection on a request as the
+    # connect=True parameter of MongoClient seems unreliable
+    client.server_info()
+    db = client["travel_booking"]
+    users_collection = db["users"]
+    messages_collection = db["messages"]
+except Exception as e:
+    print(f"Error connecting to MongoDB: {e}")
+    db = None
+    users_collection = None
+    messages_collection = None
 
 
 # ====== ROUTES ======
