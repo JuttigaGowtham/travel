@@ -30,7 +30,12 @@ except Exception as e:
 @app.route("/")
 def index():
     if not db_connected:
-        return "<h2>Database connection error. Please contact support.</h2>", 500
+        return (
+            "<h2>Database connection error.</h2>"
+            "<p>Please check your MongoDB connection string.</p>"
+            "<p>If deploying on Render, set the MONGO_URI environment variable to your MongoDB Atlas connection string.</p>"
+            "<p>If running locally, ensure MongoDB is running and accessible at the URI specified.</p>", 500
+        )
     if "user" in session:
         return redirect(url_for("home"))
     return render_template("login.html")
